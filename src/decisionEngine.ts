@@ -86,9 +86,10 @@ export function evaluateSubstitution(
   // 2. Dietary Restrictions (Hard Constraint)
   const violatedRestrictions = mandate.dietaryRestrictions.filter((restriction) =>
     candidate.ingredients.some(ing => ing.toLowerCase().includes(restriction.toLowerCase())) ||
-    candidate.name.toLowerCase().includes(restriction.toLowerCase())
+    candidate.name.toLowerCase().includes(restriction.toLowerCase()) ||
+    candidate.category.toLowerCase().includes(restriction.toLowerCase())
   );
-  
+
   if (violatedRestrictions.length > 0) {
     checks.push({
       name: "Dietary Restrictions",
@@ -138,7 +139,7 @@ export function evaluateSubstitution(
         passed: false,
         details: `Size mismatch: requested ${original.size}, found ${candidate.size}.`,
       });
-      if(!isBlocked) isAsk = true;
+      if (!isBlocked) isAsk = true;
     } else {
       checks.push({
         name: "Package Size Equivalence",
@@ -156,7 +157,7 @@ export function evaluateSubstitution(
         passed: false,
         details: `Category mismatch: requested ${original.category}, found ${candidate.category}.`,
       });
-      if(!isBlocked) isAsk = true;
+      if (!isBlocked) isAsk = true;
     } else {
       checks.push({
         name: "Category Equivalence",
@@ -174,7 +175,7 @@ export function evaluateSubstitution(
       passed: false,
       details: `Increase of ₹${priceDiff.toFixed(2)} exceeds ₹${mandate.maxAbsolutePriceIncrease.toFixed(2)} limit.`,
     });
-    if(!isBlocked) isAsk = true;
+    if (!isBlocked) isAsk = true;
   } else {
     checks.push({
       name: "Absolute Price Limit",
@@ -192,7 +193,7 @@ export function evaluateSubstitution(
         passed: false,
         details: `Increase of ${pctDiff.toFixed(1)}% exceeds ${mandate.maxPercentagePriceIncrease}% limit.`,
       });
-      if(!isBlocked) isAsk = true;
+      if (!isBlocked) isAsk = true;
     } else {
       checks.push({
         name: "Percentage Price Limit",
@@ -205,19 +206,19 @@ export function evaluateSubstitution(
   // 8. Brand Preference
   if (candidate.brand && mandate.preferredBrands.length > 0) {
     if (!mandate.preferredBrands.includes(candidate.brand)) {
-       checks.push({
-         name: "Brand Preference",
-         passed: false,
-         details: `Brand '${candidate.brand}' is not in preferred list.`,
-       });
-       // Just a warning, maybe ask
-       if(!isBlocked) isAsk = true;
+      checks.push({
+        name: "Brand Preference",
+        passed: false,
+        details: `Brand '${candidate.brand}' is not in preferred list.`,
+      });
+      // Just a warning, maybe ask
+      if (!isBlocked) isAsk = true;
     } else {
-       checks.push({
-         name: "Brand Preference",
-         passed: true,
-         details: `Brand '${candidate.brand}' is preferred.`,
-       });
+      checks.push({
+        name: "Brand Preference",
+        passed: true,
+        details: `Brand '${candidate.brand}' is preferred.`,
+      });
     }
   }
 
@@ -227,7 +228,7 @@ export function evaluateSubstitution(
 
   let finalAction = `Substitute ${original.name} with ${candidate.name}`;
   const channelText = mandate.doubtResolutionChannel === 'whatsapp' ? 'via WhatsApp' : mandate.doubtResolutionChannel === 'in-app' ? 'via In-App Notification' : 'and auto-rejected';
-  
+
   if (isBlocked) {
     decision = "STOP";
     reason = "A hard constraint or revoked permission blocked this action.";
@@ -311,7 +312,7 @@ export function evaluateCheckout(
       details: `Within allowed order frequency.`,
     });
   }
-  
+
   // 4. Unresolved Items / ASK Queue
   const unresolved = basket.filter(i => i.status === 'ask' || (i.isUnavailable && i.status === 'pending'));
   if (unresolved.length > 0) {
@@ -328,10 +329,10 @@ export function evaluateCheckout(
       details: "All basket items are resolved or autonomously approved.",
     });
   }
-  
+
   // 5. Blocked Items explicitly excluded? (We assume they are just dropped, so this is okay)
   const blocked = basket.filter(i => i.status === 'stop');
-  if(blocked.length > 0) {
+  if (blocked.length > 0) {
     checks.push({
       name: "Blocked Items Check",
       passed: true,
@@ -342,12 +343,13 @@ export function evaluateCheckout(
   // 6. Basket-level Dietary Check
   const basketViolations = basket.flatMap(item => {
     const productToCheck = item.replacement && item.status !== 'stop' && item.status !== 'rejected' ? item.replacement : item.product;
-    return mandate.dietaryRestrictions.filter(r => 
+    return mandate.dietaryRestrictions.filter(r =>
       productToCheck.ingredients.some(ing => ing.toLowerCase().includes(r.toLowerCase())) ||
-      productToCheck.name.toLowerCase().includes(r.toLowerCase())
+      productToCheck.name.toLowerCase().includes(r.toLowerCase()) ||
+      productToCheck.category.toLowerCase().includes(r.toLowerCase())
     );
   });
-  
+
   if (basketViolations.length > 0) {
     checks.push({
       name: "Dietary Restrictions (Basket Level)",
@@ -400,7 +402,7 @@ export function evaluateCheckout(
   let decision: DecisionResult;
   let reason: string;
   let requiredAction: string | undefined;
-  
+
   const channelText = mandate.doubtResolutionChannel === 'whatsapp' ? 'via WhatsApp' : mandate.doubtResolutionChannel === 'in-app' ? 'via In-App Notification' : 'and auto-rejected';
   let finalAction = "Finalize and Submit Order";
 
