@@ -7,7 +7,7 @@ import { catalog } from '../mockData';
 export default function Workspace() {
   const { logs, setupScenario } = useShopping();
 
-  const loadScenario = (type: 'safe' | 'price' | 'allergy') => {
+  const loadScenario = (type: 'safe' | 'price' | 'allergy' | 'brand') => {
     const baseBasket = [
       { id: `b_${Date.now()}_1`, product: catalog.find(p => p.id === 'p1')!, quantity: 1, isUnavailable: false, status: 'pending' as const },
       { id: `b_${Date.now()}_2`, product: catalog.find(p => p.id === 'p11')!, quantity: 1, isUnavailable: false, status: 'pending' as const },
@@ -33,6 +33,14 @@ export default function Workspace() {
           { id: `b_${Date.now()}_3`, product: catalog.find(p => p.id === 'p1')!, quantity: 1, isUnavailable: false, status: 'pending' as const }  // Milk
         ]
       );
+    } else if (type === 'brand') {
+      setupScenario(
+        { budget: 1000, maxAbsolutePriceIncrease: 150, preferredBrands: ['Amul'], doubtResolutionChannel: 'in-app' }, 
+        [
+          { id: `b_${Date.now()}_1`, product: catalog.find(p => p.id === 'p2')!, quantity: 1, isUnavailable: false, status: 'pending' as const }, // Amul Milk
+          { id: `b_${Date.now()}_2`, product: catalog.find(p => p.id === 'p5')!, quantity: 1, isUnavailable: false, status: 'pending' as const }  // Bread
+        ]
+      );
     }
   };
 
@@ -53,6 +61,9 @@ export default function Workspace() {
           <div className="flex flex-wrap gap-2">
             <button className="btn btn-outline bg-white text-[11px] py-1 px-2 border-green-200 text-green-800 hover:bg-green-50" onClick={() => loadScenario('safe')}>
               Safe Sub (ACT)
+            </button>
+            <button className="btn btn-outline bg-white text-[11px] py-1 px-2 border-amber-200 text-amber-800 hover:bg-amber-50" onClick={() => loadScenario('brand')}>
+              Brand Mismatch (ASK)
             </button>
             <button className="btn btn-outline bg-white text-[11px] py-1 px-2 border-red-200 text-red-800 hover:bg-red-50" onClick={() => loadScenario('price')}>
               Price Spike (STOP)
