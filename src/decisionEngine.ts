@@ -85,7 +85,8 @@ export function evaluateSubstitution(
 
   // 2. Dietary Restrictions (Hard Constraint)
   const violatedRestrictions = mandate.dietaryRestrictions.filter((restriction) =>
-    candidate.ingredients.map(i => i.toLowerCase()).includes(restriction.toLowerCase())
+    candidate.ingredients.some(ing => ing.toLowerCase().includes(restriction.toLowerCase())) ||
+    candidate.name.toLowerCase().includes(restriction.toLowerCase())
   );
   
   if (violatedRestrictions.length > 0) {
