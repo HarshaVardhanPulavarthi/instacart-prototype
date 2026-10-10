@@ -247,6 +247,14 @@ export function evaluateSubstitution(
     reason = "All Decision Budget checks passed. Agent can act autonomously.";
   }
 
+  console.log("EVALUATING BRAND:", {
+    candidateBrand: candidate.brand,
+    preferredBrands: mandate.preferredBrands,
+    isAsk: isAsk,
+    decision: decision,
+    checks: checks.filter(c => c.name === 'Brand Preference')
+  });
+
   return {
     action: finalAction,
     decision,
