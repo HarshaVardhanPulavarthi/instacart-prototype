@@ -231,7 +231,10 @@ export function evaluateSubstitution(
 
   if (isBlocked) {
     decision = "STOP";
-    reason = "A hard constraint or revoked permission blocked this action.";
+    const failedChecks = checks.filter(c => c.passed === false).map(c => c.name);
+    reason = failedChecks.length > 0 
+      ? `Action blocked by: ${failedChecks.join(', ')}.` 
+      : "A hard constraint or revoked permission blocked this action.";
     requiredAction = "The item is blocked and will not be added to the order.";
     finalAction = `Halted execution ${channelText}: Blocked substitution of ${original.name}`;
   } else if (isAsk) {
@@ -408,7 +411,10 @@ export function evaluateCheckout(
 
   if (isBlocked) {
     decision = "STOP";
-    reason = "Checkout blocked by a hard constraint (budget, limits, diet, or revoked permission).";
+    const failedChecks = checks.filter(c => c.passed === false).map(c => c.name);
+    reason = failedChecks.length > 0
+      ? `Checkout blocked by: ${failedChecks.join(', ')}.`
+      : "Checkout blocked by a hard constraint.";
     requiredAction = "Adjust the budget, remove items, or restore permissions to proceed.";
     finalAction = `Halted checkout ${channelText}`;
   } else if (isAsk) {
