@@ -62,10 +62,25 @@ export default function LandingPage({ setView }: { setView: (v: string) => void 
     <div className="animate-fade-in pb-16">
       {/* A. Above the fold (Hero) */}
       <section className="text-center py-16 px-4 mb-8 bg-white border-b border-gray-200 rounded-2xl shadow-sm">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-50 text-green-800 text-xs font-semibold rounded-full border border-green-200 mb-6 uppercase tracking-wider">
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          Interactive Prototype
+        {/* Case Study Submission Badge */}
+        <div className="inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 px-4 py-2 bg-gradient-to-r from-emerald-50 via-white to-emerald-50 text-gray-800 rounded-2xl border border-emerald-200/80 mb-6 shadow-2xs max-w-2xl mx-auto">
+          <span className="inline-flex items-center gap-1.5 font-bold text-xs sm:text-sm text-[#1C4233]">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Inmobi Glance Product Associate Case Study
+          </span>
+          <span className="text-gray-300 hidden sm:inline">•</span>
+          <div className="flex items-center gap-1.5 text-xs sm:text-sm">
+            <span className="font-semibold text-gray-900">Ramidi Chinmayee</span>
+            <span className="font-mono text-[11px] bg-emerald-100/70 text-emerald-900 px-2 py-0.5 rounded-md font-bold border border-emerald-200">
+              CO23BTECH11019
+            </span>
+          </div>
+          <span className="text-gray-300 hidden sm:inline">•</span>
+          <span className="text-[10px] uppercase tracking-wider font-extrabold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+            Mockup
+          </span>
         </div>
+
         <h2 className="text-xl text-primary font-semibold mb-2 m-0 tracking-wide uppercase">Instacart Agent-Readiness Lab</h2>
         <h1 className="text-5xl font-bold text-gray-900 mb-6 max-w-4xl mx-auto" style={{ letterSpacing: '-0.03em' }}>
           Can an AI shop for you without overstepping?
@@ -221,8 +236,19 @@ export default function LandingPage({ setView }: { setView: (v: string) => void 
           />
         </div>
         
-        <div className="mt-8 pt-4 border-t border-gray-100 text-xs text-gray-500 text-center">
-          <span className="font-semibold text-gray-700">Note:</span> This is a static frontend prototype. Payment gateways, backend databases, and real LLM integrations are strictly simulated. All decision logic is deterministic TypeScript running in the browser.
+        <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-3">
+          <div className="text-center sm:text-left">
+            <span className="font-bold text-gray-800">Inmobi Glance Product Associate Case Study Mockup</span>
+            <div className="text-[11px] text-gray-500 mt-0.5">
+              Candidate: <strong className="text-gray-800">Ramidi Chinmayee</strong> (<span className="font-mono font-semibold text-gray-700">CO23BTECH11019</span>)
+            </div>
+          </div>
+          <div className="text-[11px] text-gray-400 text-center sm:text-right">
+            Deterministic Decision Gateway & Agent Governance Prototype
+          </div>
+        </div>
+        <div className="mt-3 text-[11px] text-gray-400 text-center">
+          <span className="font-semibold text-gray-500">Note:</span> This is a static frontend prototype. Payment gateways, backend databases, and real LLM integrations are simulated via deterministic TypeScript.
         </div>
       </section>
     </div>
