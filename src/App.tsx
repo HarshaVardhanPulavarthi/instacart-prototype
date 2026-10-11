@@ -4,9 +4,10 @@ import HeroScenario from './components/new/HeroScenario';
 import Workspace from './components/Workspace';
 import QuantityDemo from './components/new/QuantityDemo';
 import FeaturesShowcase from './components/new/FeaturesShowcase';
+import AgentDrivingTest from './components/new/AgentDrivingTest';
 import { ShoppingProvider } from './context/ShoppingContext';
 
-type ViewState = 'landing' | 'hero' | 'workspace' | 'quantityDemo' | 'features';
+type ViewState = 'landing' | 'hero' | 'workspace' | 'drivingTest' | 'quantityDemo' | 'features';
 
 function App() {
   const [view, setView] = useState<ViewState>('landing');
@@ -28,6 +29,7 @@ function App() {
               <button className={`nav-tab whitespace-nowrap ${view === 'landing' ? 'active' : ''}`} onClick={() => setView('landing')}>Home</button>
               <button className={`nav-tab whitespace-nowrap ${view === 'hero' ? 'active' : ''}`} onClick={() => setView('hero')}>Story Mode</button>
               <button className={`nav-tab whitespace-nowrap ${view === 'workspace' ? 'active' : ''}`} onClick={() => setView('workspace')}>Simulator</button>
+              <button className={`nav-tab whitespace-nowrap ${view === 'drivingTest' ? 'active' : ''}`} onClick={() => setView('drivingTest')}>Driving Test</button>
               <button className={`nav-tab whitespace-nowrap ${view === 'quantityDemo' ? 'active' : ''}`} onClick={() => setView('quantityDemo')}>Package Semantics</button>
               <button className={`nav-tab whitespace-nowrap ${view === 'features' ? 'active' : ''}`} onClick={() => setView('features')}>Architecture</button>
             </nav>
@@ -38,6 +40,7 @@ function App() {
           {view === 'landing' && <LandingPage setView={(v) => setView(v as ViewState)} />}
           {view === 'hero' && <HeroScenario onSwitchToWorkspace={() => setView('workspace')} />}
           {view === 'workspace' && <Workspace />}
+          {view === 'drivingTest' && <AgentDrivingTest />}
           {view === 'quantityDemo' && <QuantityDemo />}
           {view === 'features' && <FeaturesShowcase />}
         </main>

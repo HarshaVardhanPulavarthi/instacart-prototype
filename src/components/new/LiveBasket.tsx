@@ -2,18 +2,21 @@ import { useState } from 'react';
 import { useShopping } from '../../context/ShoppingContext';
 import { catalog } from '../../mockData';
 import { evaluateCheckout } from '../../decisionEngine';
-import { AlertTriangle, Search, ShoppingCart, Loader2, CheckCircle2, XCircle, ShieldCheck, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Search, ShoppingCart, Loader2, CheckCircle2, XCircle, ShieldCheck, RefreshCw, TrendingUp } from 'lucide-react';
 import DecisionExplanation from './DecisionExplanation';
 
 export default function LiveBasket() {
   const { 
     basket, mandate, basketTotal, changeQuantity, markUnavailable, 
-    addLog, transactionStatus, setTransactionStatus, resolveAsk, addItem
+    addLog, transactionStatus, setTransactionStatus, resolveAsk, addItem, updateBasket
   } = useShopping();
   
   const [checkoutResult, setCheckoutResult] = useState<{status: string, reason: string} | null>(null);
   const [resolvingId, setResolvingId] = useState<string | null>(null);
   const [explainingLog, setExplainingLog] = useState<any>(null);
+
+  const isOverBudget = basketTotal > mandate.budget;
+  const budgetDelta = Math.abs(basketTotal - mandate.budget);
 
   const handleSimulateCheckout = () => {
     if (transactionStatus === 'PENDING_VERIFICATION') return;
@@ -26,7 +29,7 @@ export default function LiveBasket() {
       setTimeout(() => {
         setTransactionStatus('SUBMITTED');
         
-        // Deterministic timeout for demo: If budget is exactly ₹100.
+        // Deterministic timeout for demo if budget is exactly ₹100
         const simulateTimeout = mandate.budget === 100;
         
         setTimeout(() => {
@@ -35,7 +38,7 @@ export default function LiveBasket() {
             setCheckoutResult({ status: 'unknown', reason: 'Network timeout during submission. Did it succeed?' });
           } else {
             setTransactionStatus('CONFIRMED');
-            setCheckoutResult({ status: 'confirmed', reason: 'Order successfully placed and confirmed.' });
+            setCheckoutResult({ status: 'confirmed', reason: 'Order successfully placed and confirmed with idempotency key.' });
           }
         }, 1500);
       }, 1000);
@@ -48,11 +51,36 @@ export default function LiveBasket() {
     }
   };
 
+  const handleSimulatePriceIncrease = (itemId: string, increment: number) => {
+    updateBasket(basket.map(item => {
+      if (item.id === itemId) {
+        const newProduct = { ...item.product, price: item.product.price + increment };
+        return { ...item, product: newProduct };
+      }
+      return item;
+    }));
+    addLog({
+      action: `Simulated price increase (+₹${increment.toFixed(2)})`,
+      decision: basketTotal + increment > mandate.budget ? 'STOP' : 'ACT',
+      checks: [
+        { 
+          name: "Spending Cap", 
+          passed: basketTotal + increment <= mandate.budget, 
+          details: `New basket total ₹${(basketTotal + increment).toFixed(2)} vs spending cap ₹${mandate.budget.toFixed(2)}.` 
+        }
+      ],
+      reason: basketTotal + increment > mandate.budget 
+        ? `Price surge pushes total over the ₹${mandate.budget.toFixed(2)} budget limit.` 
+        : `Price surge absorbed within existing spending cap.`,
+      timestamp: Date.now()
+    });
+  };
+
   const verifyTransaction = () => {
     setTransactionStatus('VALIDATING');
     setTimeout(() => {
       setTransactionStatus('CONFIRMED');
-      setCheckoutResult({ status: 'confirmed', reason: 'Idempotency key check: Transaction actually succeeded.' });
+      setCheckoutResult({ status: 'confirmed', reason: 'Idempotency key check verified: Transaction recorded exactly once.' });
     }, 1500);
   };
 
@@ -65,17 +93,58 @@ export default function LiveBasket() {
 
   return (
     <div className="workspace-panel h-full flex flex-col p-0 overflow-hidden">
+      {/* Header */}
       <div className="flex justify-between items-center p-6 text-white" style={{ backgroundColor: 'var(--color-primary)' }}>
-        <h2 className="text-xl m-0 flex items-center gap-2 text-white font-bold">
-          <ShoppingCart size={20} />
-          Live Basket
-        </h2>
+        <div>
+          <h2 className="text-xl m-0 flex items-center gap-2 text-white font-bold">
+            <ShoppingCart size={20} />
+            Live Basket
+          </h2>
+          <span className="text-[11px] text-[#D0E2D6] font-medium">Real-time budget enforcement</span>
+        </div>
         <div className="text-right">
-          <div className="text-xs text-[#E3E9E5] uppercase tracking-wider font-semibold">Total Authorized</div>
-          <div className="text-2xl font-bold">₹{basketTotal.toFixed(2)}</div>
+          <div className="text-xs text-[#E3E9E5] uppercase tracking-wider font-semibold">Running Total</div>
+          <div className="text-2xl font-bold font-mono">₹{basketTotal.toFixed(2)}</div>
         </div>
       </div>
 
+      {/* Feature 3: Live Budget Enforcement Gauge */}
+      <div className={`p-3.5 border-b text-xs flex flex-col gap-1.5 transition-colors ${isOverBudget ? 'bg-red-50 border-red-200 text-red-900' : 'bg-green-50 border-green-200 text-green-900'}`}>
+        <div className="flex justify-between items-center font-semibold">
+          <div className="flex items-center gap-2">
+            <span>{isOverBudget ? '🚫' : '🛡️'}</span>
+            <span>
+              {isOverBudget ? (
+                <>Budget Exceeded by <strong className="font-bold text-red-700">₹{budgetDelta.toFixed(2)}</strong></>
+              ) : (
+                <>Within Spending Cap (₹{basketTotal.toFixed(2)} of ₹{mandate.budget.toFixed(2)})</>
+              )}
+            </span>
+          </div>
+          <span className={`badge ${isOverBudget ? 'badge-stop' : 'badge-act'} text-[10px] px-2 py-0.5`}>
+            {isOverBudget ? 'CHECKOUT BLOCKED (STOP)' : 'AUTHORIZED (ACT)'}
+          </span>
+        </div>
+
+        {/* Progress bar */}
+        <div className="w-full bg-black/10 rounded-full h-1.5 overflow-hidden">
+          <div 
+            className={`h-full transition-all duration-300 ${isOverBudget ? 'bg-red-600' : 'bg-green-600'}`}
+            style={{ width: `${Math.min(100, (basketTotal / Math.max(1, mandate.budget)) * 100)}%` }}
+          />
+        </div>
+
+        <div className="text-[10px] text-gray-600 flex justify-between items-center">
+          <span>
+            {isOverBudget 
+              ? 'Changing the budget in the Constitution Editor on the left instantly unblocks this checkout.' 
+              : 'Rules actually affect checkout execution, not just visual indicators.'}
+          </span>
+          <span className="font-mono font-semibold">Cap: ₹{mandate.budget.toFixed(2)}</span>
+        </div>
+      </div>
+
+      {/* Items List */}
       <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
         {basket.map(item => {
           const productToDisplay = item.replacement && item.status !== 'ask' && item.status !== 'rejected' && item.status !== 'stop' ? item.replacement : item.product;
@@ -84,9 +153,9 @@ export default function LiveBasket() {
           const isBlocked = item.status === 'stop' || item.status === 'rejected';
 
           return (
-            <div key={item.id} className={`mb-4 rounded-xl border bg-white overflow-hidden shadow-sm transition-all ${isBlocked ? 'opacity-60 border-red-200' : 'border-gray-200'}`}>
+            <div key={item.id} className={`mb-4 rounded-xl border bg-white overflow-hidden shadow-2xs transition-all ${isBlocked ? 'opacity-60 border-red-200' : 'border-gray-200'}`}>
               
-              {/* Item Header (Requested vs Substituted context) */}
+              {/* Item Header */}
               {item.isUnavailable && (
                  <div className={`px-4 py-2 text-xs font-semibold flex justify-between items-center ${item.status === 'act' || item.status === 'approved' ? 'bg-green-50 text-green-800 border-b border-green-100' : item.status === 'stop' || item.status === 'rejected' ? 'bg-red-50 text-red-800 border-b border-red-100' : 'bg-amber-50 text-amber-800 border-b border-amber-100'}`}>
                    <span>
@@ -101,17 +170,16 @@ export default function LiveBasket() {
               )}
 
               <div className="p-4 flex gap-4">
-                {/* Thumbnail placeholder */}
                 <div className="w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex-shrink-0 flex items-center justify-center text-2xl">
                   🛒
                 </div>
                 
                 <div className="flex-1">
                   <div className="flex justify-between items-start mb-1">
-                    <div className={isBlocked ? 'line-through text-gray-400' : 'font-semibold text-gray-900'}>
+                    <div className={isBlocked ? 'line-through text-gray-400 font-semibold' : 'font-bold text-gray-900'}>
                       {productToDisplay.name}
                     </div>
-                    <div className="font-bold">₹{currentPrice.toFixed(2)}</div>
+                    <div className="font-bold font-mono">₹{currentPrice.toFixed(2)}</div>
                   </div>
                   <div className="text-xs text-gray-500 mb-3">
                     ₹{productToDisplay.price.toFixed(2)} / {productToDisplay.size} • {productToDisplay.brand}
@@ -124,15 +192,31 @@ export default function LiveBasket() {
                   )}
 
                   {!item.isUnavailable ? (
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-3 border border-gray-200 rounded-full px-2 py-1">
-                        <button className="text-gray-400 hover:text-gray-900 w-6 h-6 flex items-center justify-center" onClick={() => changeQuantity(item.id, item.quantity - 1)}>-</button>
-                        <span className="text-sm font-semibold w-4 text-center">{item.quantity}</span>
-                        <button className="text-gray-400 hover:text-gray-900 w-6 h-6 flex items-center justify-center" onClick={() => changeQuantity(item.id, item.quantity + 1)}>+</button>
+                    <div className="flex flex-wrap justify-between items-center gap-2">
+                      <div className="flex items-center gap-3 border border-gray-200 rounded-full px-2 py-0.5 bg-gray-50">
+                        <button className="text-gray-400 hover:text-gray-900 w-5 h-5 flex items-center justify-center text-sm" onClick={() => changeQuantity(item.id, item.quantity - 1)}>-</button>
+                        <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
+                        <button className="text-gray-400 hover:text-gray-900 w-5 h-5 flex items-center justify-center text-sm" onClick={() => changeQuantity(item.id, item.quantity + 1)}>+</button>
                       </div>
-                      <button className="text-[10px] text-amber-600 font-semibold hover:underline flex items-center gap-1" onClick={() => markUnavailable(item.id)}>
-                        <AlertTriangle size={12}/> Simulate Stockout
-                      </button>
+
+                      <div className="flex items-center gap-2">
+                        {/* Simulate Price Increase Button */}
+                        <button 
+                          className="text-[10px] text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-2 py-1 rounded font-semibold flex items-center gap-1 transition-colors"
+                          onClick={() => handleSimulatePriceIncrease(item.id, 100)}
+                          title="Simulate a sudden price increase of ₹100"
+                        >
+                          <TrendingUp size={11} /> Price Surge (+₹100)
+                        </button>
+
+                        {/* Simulate Stockout Button */}
+                        <button 
+                          className="text-[10px] text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2 py-1 rounded font-semibold flex items-center gap-1 transition-colors" 
+                          onClick={() => markUnavailable(item.id)}
+                        >
+                          <AlertTriangle size={11}/> Stockout
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div>
@@ -153,7 +237,7 @@ export default function LiveBasket() {
                                      <div className="text-xs font-semibold">{candidate.name}</div>
                                      <div className="text-[10px] text-gray-500">₹{candidate.price.toFixed(2)} • {candidate.size}</div>
                                    </div>
-                                   <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center"><ArrowRightIcon /></div>
+                                   <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs">→</div>
                                  </button>
                                ))}
                                <button className="text-xs text-gray-500 text-center mt-1" onClick={() => setResolvingId(null)}>Cancel</button>
@@ -174,9 +258,10 @@ export default function LiveBasket() {
         })}
       </div>
 
+      {/* Quick Add Shelf */}
       <div className="p-4 bg-white border-t border-gray-200">
-        <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Quick Add Items</div>
-        <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+        <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Quick Add Catalog Items</div>
+        <div className="flex gap-2 overflow-x-auto pb-1 custom-scrollbar">
           {catalog.filter(p => !p.isAmbiguousSize).slice(0, 8).map(product => (
             <button 
               key={product.id}
@@ -184,12 +269,13 @@ export default function LiveBasket() {
               className="flex-shrink-0 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg p-2 text-left w-32 transition-colors"
             >
               <div className="font-semibold text-xs text-gray-900 truncate">{product.name}</div>
-              <div className="text-[10px] text-gray-500 mt-1">₹{product.price.toFixed(2)}</div>
+              <div className="text-[10px] text-gray-500 mt-1 font-mono">₹{product.price.toFixed(2)}</div>
             </button>
           ))}
         </div>
       </div>
 
+      {/* Checkout Section */}
       <div className="p-5 border-t border-gray-200 bg-white">
         {/* Transaction Feedback */}
         {transactionStatus !== 'DRAFT' && checkoutResult && (
@@ -211,7 +297,7 @@ export default function LiveBasket() {
               <h4 className="text-sm font-bold mb-1 m-0">
                 {transactionStatus === 'PENDING_VERIFICATION' ? 'Uncertain Transaction State' : 
                  transactionStatus === 'CONFIRMED' ? 'Verified Success' : 
-                 transactionStatus === 'BLOCKED' ? 'Checkout Blocked' : 
+                 transactionStatus === 'BLOCKED' ? 'Checkout Blocked by Gateway' : 
                  transactionStatus === 'AWAITING_APPROVAL' ? 'Exceptions Require Approval' :
                  transactionStatus}
               </h4>
@@ -227,11 +313,18 @@ export default function LiveBasket() {
         )}
 
         <button 
-          className={`btn w-full text-base font-bold py-4 ${transactionStatus === 'PENDING_VERIFICATION' ? 'btn-outline bg-gray-50' : 'btn-primary'}`}
+          className={`btn w-full text-base font-bold py-3.5 ${
+            isOverBudget || mandate.isPaused || !mandate.permissionValid ? 'bg-red-700 hover:bg-red-800 text-white' : 
+            transactionStatus === 'PENDING_VERIFICATION' ? 'btn-outline bg-gray-50' : 'btn-primary'
+          }`}
           onClick={handleSimulateCheckout}
           disabled={transactionStatus === 'VALIDATING' || transactionStatus === 'SUBMITTED' || transactionStatus === 'PENDING_VERIFICATION' || basket.length === 0}
         >
-          {transactionStatus === 'PENDING_VERIFICATION' ? 'Checking Status...' : 'Simulate Checkout'}
+          {transactionStatus === 'PENDING_VERIFICATION' ? 'Checking Status...' : 
+           mandate.isPaused ? 'Agent Paused (Cannot Checkout)' :
+           !mandate.permissionValid ? 'Permission Revoked (Cannot Checkout)' :
+           isOverBudget ? `Blocked: Over Budget (₹${basketTotal.toFixed(2)} > ₹${mandate.budget.toFixed(2)})` : 
+           'Simulate Checkout'}
         </button>
       </div>
 
@@ -240,8 +333,4 @@ export default function LiveBasket() {
       )}
     </div>
   );
-}
-
-function ArrowRightIcon() {
-  return <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
 }

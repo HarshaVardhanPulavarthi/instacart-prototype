@@ -9,6 +9,9 @@ export interface Mandate {
   requireCategoryEquivalence: boolean;
   dietaryRestrictions: string[]; // Hard constraints
   permissionValid: boolean;
+  isPaused: boolean; // Pause Agent control
+  autonomyLevel: 'prepare-and-confirm' | 'settled-staples' | 'broader-autonomy'; // Pilot autonomy tiers
+  approvedStaples: string[]; // Approved staples for autonomous replenishment
   orderAllowance: number;
   ordersUsed: number;
   preferredBrands: string[];
@@ -67,28 +70,58 @@ export function evaluateSubstitution(
   let isBlocked = false;
   let isAsk = false;
 
-  // 1. Mandate Permission (Hard Constraint)
-  if (!mandate.permissionValid) {
+  // 1. Pause Control
+  if (mandate.isPaused) {
     checks.push({
-      name: "Agent Permission",
+      name: "Agent Standby",
       passed: false,
-      details: "Agent authority has been revoked.",
+      details: "Agent execution is temporarily paused by user. Autonomous actions on hold.",
     });
     isBlocked = true;
-  } else {
+  }
+
+  // 2. Mandate Permission (Hard Kill-Switch)
+  if (!mandate.permissionValid) {
     checks.push({
-      name: "Agent Permission",
+      name: "Agent Authority",
+      passed: false,
+      details: "Agent authority has been revoked by user kill-switch.",
+    });
+    isBlocked = true;
+  } else if (!mandate.isPaused) {
+    checks.push({
+      name: "Agent Authority",
       passed: true,
       details: "Agent is authorized to act.",
     });
   }
 
-  // 2. Dietary Restrictions (Hard Constraint)
-  const violatedRestrictions = mandate.dietaryRestrictions.filter((restriction) =>
-    candidate.ingredients.some(ing => ing.toLowerCase().includes(restriction.toLowerCase())) ||
-    candidate.name.toLowerCase().includes(restriction.toLowerCase()) ||
-    candidate.category.toLowerCase().includes(restriction.toLowerCase())
-  );
+  // 3. Dietary Restrictions (Hard Constraint - never overridden)
+  const violatedRestrictions = mandate.dietaryRestrictions.filter((restriction) => {
+    const rLower = restriction.toLowerCase();
+    const searchTerms = [rLower];
+    if (rLower.includes('tree') || rLower.includes('nut')) {
+      searchTerms.push('almond', 'walnut', 'cashew', 'pistachio', 'hazelnut', 'pecan', 'nut');
+    }
+    if (rLower.includes('peanut')) {
+      searchTerms.push('peanut', 'groundnut');
+    }
+    if (rLower.includes('dairy') || rLower.includes('milk')) {
+      searchTerms.push('milk', 'dairy', 'butter', 'cheese', 'whey', 'curd', 'ghee', 'cream');
+    }
+    if (rLower.includes('gluten')) {
+      searchTerms.push('gluten', 'wheat', 'barley', 'rye', 'maida');
+    }
+    if (rLower.includes('palm')) {
+      searchTerms.push('palm oil', 'palmolein');
+    }
+
+    return searchTerms.some(term =>
+      candidate.ingredients.some(ing => ing.toLowerCase().includes(term)) ||
+      candidate.name.toLowerCase().includes(term) ||
+      candidate.category.toLowerCase().includes(term)
+    );
+  });
 
   if (violatedRestrictions.length > 0) {
     checks.push({
@@ -103,6 +136,35 @@ export function evaluateSubstitution(
       passed: true,
       details: "No hard constraints violated.",
     });
+  }
+
+  // 4. Autonomy Level Scope
+  if (mandate.autonomyLevel === 'prepare-and-confirm') {
+    checks.push({
+      name: "Autonomy Level",
+      passed: false,
+      details: "Autonomy set to 'Prepare-and-Confirm'. All substitutions require explicit human approval.",
+    });
+    isAsk = true;
+  } else if (mandate.autonomyLevel === 'settled-staples') {
+    const isApprovedStaple = mandate.approvedStaples?.some(staple =>
+      candidate.name.toLowerCase().includes(staple.toLowerCase()) ||
+      original.name.toLowerCase().includes(staple.toLowerCase())
+    );
+    if (!isApprovedStaple && mandate.approvedStaples && mandate.approvedStaples.length > 0) {
+      checks.push({
+        name: "Approved Staples Scope",
+        passed: false,
+        details: `'${candidate.name}' is an unfamiliar item outside your Approved Staples. Escalating for confirmation.`,
+      });
+      isAsk = true;
+    } else {
+      checks.push({
+        name: "Approved Staples Scope",
+        passed: true,
+        details: "Item falls within settled staples scope.",
+      });
+    }
   }
 
   // 3. Substitutions Allowed
@@ -276,20 +338,40 @@ export function evaluateCheckout(
   let isBlocked = false;
   let isAsk = false;
 
-  // 1. Permission Valid
+  // 1. Pause Control
+  if (mandate.isPaused) {
+    checks.push({
+      name: "Agent Standby",
+      passed: false,
+      details: "Agent is currently paused by the user. Checkout on hold.",
+    });
+    isBlocked = true;
+  }
+
+  // 2. Permission Valid (Kill Switch)
   if (!mandate.permissionValid) {
     checks.push({
       name: "Agent Authority",
       passed: false,
-      details: "Permission has been explicitly revoked.",
+      details: "Agent permission has been explicitly revoked by user kill-switch.",
     });
     isBlocked = true;
-  } else {
+  } else if (!mandate.isPaused) {
     checks.push({
       name: "Agent Authority",
       passed: true,
       details: "Agent has active permission.",
     });
+  }
+
+  // 3. Autonomy Level
+  if (mandate.autonomyLevel === 'prepare-and-confirm') {
+    checks.push({
+      name: "Autonomy Level",
+      passed: false,
+      details: "Prepare-and-Confirm mode requires explicit human confirmation to submit checkout.",
+    });
+    isAsk = true;
   }
 
   // 2. Budget
@@ -354,11 +436,31 @@ export function evaluateCheckout(
   // 6. Basket-level Dietary Check
   const basketViolations = basket.flatMap(item => {
     const productToCheck = item.replacement && item.status !== 'stop' && item.status !== 'rejected' ? item.replacement : item.product;
-    return mandate.dietaryRestrictions.filter(r =>
-      productToCheck.ingredients.some(ing => ing.toLowerCase().includes(r.toLowerCase())) ||
-      productToCheck.name.toLowerCase().includes(r.toLowerCase()) ||
-      productToCheck.category.toLowerCase().includes(r.toLowerCase())
-    );
+    return mandate.dietaryRestrictions.filter(r => {
+      const rLower = r.toLowerCase();
+      const searchTerms = [rLower];
+      if (rLower.includes('tree') || rLower.includes('nut')) {
+        searchTerms.push('almond', 'walnut', 'cashew', 'pistachio', 'hazelnut', 'pecan', 'nut');
+      }
+      if (rLower.includes('peanut')) {
+        searchTerms.push('peanut', 'groundnut');
+      }
+      if (rLower.includes('dairy') || rLower.includes('milk')) {
+        searchTerms.push('milk', 'dairy', 'butter', 'cheese', 'whey', 'curd', 'ghee', 'cream');
+      }
+      if (rLower.includes('gluten')) {
+        searchTerms.push('gluten', 'wheat', 'barley', 'rye', 'maida');
+      }
+      if (rLower.includes('palm')) {
+        searchTerms.push('palm oil', 'palmolein');
+      }
+
+      return searchTerms.some(term =>
+        productToCheck.ingredients.some(ing => ing.toLowerCase().includes(term)) ||
+        productToCheck.name.toLowerCase().includes(term) ||
+        productToCheck.category.toLowerCase().includes(term)
+      );
+    });
   });
 
   if (basketViolations.length > 0) {

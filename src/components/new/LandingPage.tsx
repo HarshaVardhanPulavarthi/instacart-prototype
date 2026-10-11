@@ -102,22 +102,27 @@ export default function LandingPage({ setView }: { setView: (v: string) => void 
         </p>
       </section>
 
-      {/* C. Three exploration paths */}
-      <section className="grid md:grid-cols-3 gap-6 mb-16">
+      {/* C. Exploration paths */}
+      <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
         <div className="card hover-lift cursor-pointer border-t-4 border-t-primary" onClick={handleStartExperience}>
           <PlayCircle size={32} className="text-primary mb-4" />
-          <h3 className="text-xl mb-2">1. Experience the product</h3>
-          <p className="text-sm text-gray-600">A guided, 2-minute simulated shopping run showing the agent interpreting intent, evaluating constraints, and producing a receipt.</p>
+          <h3 className="text-lg font-bold mb-2">1. Experience Product</h3>
+          <p className="text-xs text-gray-600">Guided 2-minute simulated shopping run showing intent, constraints, and verified receipt.</p>
         </div>
         <div className="card hover-lift cursor-pointer border-t-4 border-t-red-600" onClick={() => handleLoadScenario('dietary-restriction')}>
           <ShieldAlert size={32} className="text-red-600 mb-4" />
-          <h3 className="text-xl mb-2">2. Break the agent</h3>
-          <p className="text-sm text-gray-600">Jump directly into edge cases. See what happens when substitutions violate diets or orders timeout.</p>
+          <h3 className="text-lg font-bold mb-2">2. Break the Agent</h3>
+          <p className="text-xs text-gray-600">Jump directly into edge cases. See what happens when substitutions violate diets or prices surge.</p>
         </div>
         <div className="card hover-lift cursor-pointer border-t-4 border-t-amber-500" onClick={handleConfigureRules}>
           <Settings size={32} className="text-amber-500 mb-4" />
-          <h3 className="text-xl mb-2">3. Configure the rules</h3>
-          <p className="text-sm text-gray-600">Open the Trust Control Center. Adjust the Decision Budget and simulate stockouts to see the live engine react.</p>
+          <h3 className="text-lg font-bold mb-2">3. Constitution Editor</h3>
+          <p className="text-xs text-gray-600">Open the Trust Control Center. Adjust Decision Budget, approved staples, and autonomy tiers.</p>
+        </div>
+        <div className="card hover-lift cursor-pointer border-t-4 border-t-purple-600 bg-purple-50/20" onClick={() => setView('drivingTest')}>
+          <ShieldCheck size={32} className="text-purple-600 mb-4" />
+          <h3 className="text-lg font-bold mb-2">4. Driving Test</h3>
+          <p className="text-xs text-gray-600">Benchmark 2 simulated agents through 5 safety tests before granting payment authority.</p>
         </div>
       </section>
 

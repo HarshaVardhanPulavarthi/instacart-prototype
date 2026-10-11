@@ -7,11 +7,14 @@ export const defaultMandate: Mandate = {
   maxPercentagePriceIncrease: 15, 
   requireSamePackageSize: true,
   requireCategoryEquivalence: true,
-  dietaryRestrictions: ['Peanut', 'Gluten', 'Palm Oil'],
+  dietaryRestrictions: ['Peanut', 'Tree-Nut', 'Gluten'],
   permissionValid: true,
+  isPaused: false,
+  autonomyLevel: 'settled-staples',
+  approvedStaples: ['Toned Milk', '100% Whole Wheat Bread', 'Apples (Kashmiri)', 'Basmati Rice', 'Bananas (Robusta)', 'Nut-Free Honey Oat Granola'],
   orderAllowance: 4,
   ordersUsed: 2,
-  preferredBrands: ['Amul', 'Britannia'],
+  preferredBrands: ['Amul', 'Britannia', 'Nature Valley'],
   doubtResolutionChannel: 'whatsapp'
 };
 
@@ -33,6 +36,13 @@ export const catalog: Product[] = [
   { id: 'p15', name: 'Orange Juice', brand: 'Tropicana', price: 110.00, size: '1 Litre', category: 'Beverages', ingredients: ['Orange Juice'], imageUrl: '', unit: 'Litre', unitsPerPack: 1, totalBaseUnits: 1 },
   { id: 'p16', name: 'Diet Cola', brand: 'Coke', price: 40.00, size: '300 ml', category: 'Beverages', ingredients: ['Carbonated Water', 'Aspartame'], imageUrl: '', unit: 'Litre', unitsPerPack: 1, totalBaseUnits: 0.3 },
 
+  // Signature Challenge: Unsafe Substitution Products
+  { id: 'p20', name: 'Nut-Free Honey Oat Granola', brand: 'Nature Valley', price: 220.00, size: '400g', category: 'Cereals', ingredients: ['Rolled Oats', 'Honey', 'Sunflower Seeds'], imageUrl: '', unit: 'g', unitsPerPack: 1, totalBaseUnits: 400 },
+  { id: 'p21', name: 'Crunchy Almond Granola', brand: 'Nutty Crunch', price: 240.00, size: '400g', category: 'Cereals', ingredients: ['Rolled Oats', 'Almonds (Tree Nuts)', 'Honey'], imageUrl: '', unit: 'g', unitsPerPack: 1, totalBaseUnits: 400 },
+  { id: 'p22', name: 'Safe Berry Granola', brand: 'True Elements', price: 230.00, size: '400g', category: 'Cereals', ingredients: ['Rolled Oats', 'Dried Cranberries', 'Chia Seeds', 'Honey'], imageUrl: '', unit: 'g', unitsPerPack: 1, totalBaseUnits: 400 },
+  
+  // Unfamiliar product for ASK demo
+  { id: 'p23', name: 'Exotic Red Dragonfruit', brand: 'Fresh Imports', price: 280.00, size: '500g', category: 'Produce', ingredients: ['Dragonfruit'], imageUrl: '', unit: 'g', unitsPerPack: 1, totalBaseUnits: 500 },
   
   // Specific items for Quantity Semantics Demo
   { id: 'q1', name: 'Maida (Ambiguous)', brand: 'Fortune', price: 50.00, size: 'Pack', category: 'Baking', ingredients: ['Refined Flour'], imageUrl: '', isAmbiguousSize: true },
