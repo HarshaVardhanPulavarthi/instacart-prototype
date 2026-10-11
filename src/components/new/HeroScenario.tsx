@@ -174,7 +174,7 @@ export default function HeroScenario({ onSwitchToWorkspace }: { onSwitchToWorksp
             )}
 
             {activeScenarioStep === 6 && (
-              <div className="animate-fade-in" style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '10px' }}>
+              <div className="animate-fade-in w-full">
                 <IntentReceipt />
               </div>
             )}

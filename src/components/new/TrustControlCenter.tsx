@@ -11,7 +11,7 @@ export default function TrustControlCenter() {
   const triggerSaveNotification = (updates: Partial<typeof mandate>) => {
     updateMandate(updates);
     setShowSavedToast(true);
-    setTimeout(() => setShowSavedToast(false), 2200);
+    setTimeout(() => setShowSavedToast(false), 2000);
   };
 
   const availableStapleSuggestions = [
@@ -20,9 +20,7 @@ export default function TrustControlCenter() {
     'Apples (Kashmiri)',
     'Basmati Rice',
     'Bananas (Robusta)',
-    'Nut-Free Honey Oat Granola',
-    'Eggs (Pack of 6)',
-    'Olive Oil'
+    'Nut-Free Honey Oat Granola'
   ];
 
   const handleAddStaple = (item: string) => {
@@ -41,49 +39,53 @@ export default function TrustControlCenter() {
   };
 
   return (
-    <div className="workspace-panel h-full flex flex-col p-6 overflow-y-auto relative">
+    <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-6 flex flex-col h-full relative">
       {/* Live Sync Toast */}
       {showSavedToast && (
-        <div className="absolute top-4 right-6 z-20 bg-green-900 text-white text-xs px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 animate-fade-in border border-green-700">
-          <CheckCircle2 size={13} className="text-green-300" />
-          <span>Constitution updated & live</span>
+        <div className="absolute top-4 right-6 z-20 bg-gray-900 text-white text-[11px] px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5 animate-fade-in border border-gray-700">
+          <CheckCircle2 size={12} className="text-green-400" />
+          <span>Rules updated live</span>
         </div>
       )}
 
       {/* Header */}
-      <div className="flex justify-between items-start mb-5 pb-4 border-b border-gray-100">
-        <div>
-          <div className="flex items-center gap-2">
-            <Settings2 size={20} className="text-primary" />
-            <h2 className="text-lg m-0 font-bold text-gray-900">Agent's Constitution</h2>
+      <div className="flex justify-between items-center pb-4 mb-5 border-b border-gray-100">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+            <Settings2 size={17} />
           </div>
-          <p className="text-[11px] text-gray-500 m-0 mt-0.5">
-            Explicit constraints and permissions governing autonomous execution.
-          </p>
+          <div>
+            <h2 className="text-base font-bold text-gray-900 m-0">Agent Constitution</h2>
+            <div className="text-[11px] text-gray-400">Explicit authority boundaries</div>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full border border-green-200 font-semibold">
-            Active Mandate
-          </span>
-          <button className="text-xs font-semibold text-gray-500 hover:text-gray-900 ml-1" onClick={resetSimulation} title="Reset to defaults">
-            Reset
-          </button>
-        </div>
+        <button 
+          className="text-[11px] font-semibold text-gray-400 hover:text-gray-700 transition-colors"
+          onClick={resetSimulation} 
+          title="Reset to default mandate"
+        >
+          Reset
+        </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-6">
+      <div className="flex-1 space-y-6 overflow-y-auto pr-1">
 
         {/* 1. Autonomy Level Selection */}
-        <div className="bg-gradient-to-r from-gray-50 to-white p-3.5 rounded-xl border border-gray-200">
+        <div>
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-gray-700 m-0 flex items-center gap-1.5">
-              <span>🛡️</span> Autonomy Level
-            </h3>
-            <span className="text-[10px] text-gray-400">Governance Tier</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+              Autonomy Level
+            </span>
+            <span className="text-[10px] text-gray-400 font-medium">Governance Tier</span>
           </div>
-          <div className="flex flex-col gap-2">
+
+          <div className="space-y-1.5">
             {/* Tier 1: Prepare and Confirm */}
-            <label className={`flex items-start gap-3 p-2.5 rounded-lg border text-xs cursor-pointer transition-all ${mandate.autonomyLevel === 'prepare-and-confirm' ? 'bg-amber-50/70 border-amber-300 text-amber-950 font-medium shadow-sm' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+            <label className={`flex items-start gap-2.5 p-2.5 rounded-xl cursor-pointer transition-all ${
+              mandate.autonomyLevel === 'prepare-and-confirm'
+                ? 'bg-amber-50/80 text-amber-950 font-medium shadow-2xs'
+                : 'hover:bg-gray-50 text-gray-600'
+            }`}>
               <input
                 type="radio"
                 name="autonomyLevel"
@@ -93,18 +95,22 @@ export default function TrustControlCenter() {
                 disabled={!mandate.permissionValid}
               />
               <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-gray-900">Prepare & Confirm</span>
-                  <span className="text-[10px] px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded font-normal">Supervised</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-gray-900">Prepare & Confirm</span>
+                  <span className="text-[9px] px-1.5 py-0.2 bg-amber-100 text-amber-800 rounded font-bold uppercase">Supervised</span>
                 </div>
-                <div className="text-[11px] text-gray-500 mt-0.5">
-                  Agent builds cart, but requires explicit human sign-off for substitutions and checkout.
-                </div>
+                <p className="text-[11px] text-gray-500 m-0 mt-0.5 leading-snug">
+                  Agent plans cart, but requests user confirmation for substitutions & checkout.
+                </p>
               </div>
             </label>
 
             {/* Tier 2: Settled-Staples Autonomy */}
-            <label className={`flex items-start gap-3 p-2.5 rounded-lg border text-xs cursor-pointer transition-all ${mandate.autonomyLevel === 'settled-staples' ? 'bg-green-50/70 border-green-300 text-green-950 font-medium shadow-sm' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+            <label className={`flex items-start gap-2.5 p-2.5 rounded-xl cursor-pointer transition-all ${
+              mandate.autonomyLevel === 'settled-staples'
+                ? 'bg-green-50/80 text-green-950 font-medium shadow-2xs'
+                : 'hover:bg-gray-50 text-gray-600'
+            }`}>
               <input
                 type="radio"
                 name="autonomyLevel"
@@ -114,47 +120,46 @@ export default function TrustControlCenter() {
                 disabled={!mandate.permissionValid}
               />
               <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-gray-900">Settled-Staples Autonomy</span>
-                  <span className="text-[10px] px-1.5 py-0.2 bg-green-100 text-green-800 rounded font-normal">Recommended</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-gray-900">Settled-Staples Autonomy</span>
+                  <span className="text-[9px] px-1.5 py-0.2 bg-green-100 text-green-800 rounded font-bold uppercase">Recommended</span>
                 </div>
-                <div className="text-[11px] text-gray-500 mt-0.5">
-                  Autonomous ordering and safe substitution only for approved recurring staples within budget. Asks for new items.
-                </div>
+                <p className="text-[11px] text-gray-500 m-0 mt-0.5 leading-snug">
+                  Autonomous ordering and safe substitution for approved recurring staples.
+                </p>
               </div>
             </label>
 
-            {/* Tier 3: Broader Autonomy (Locked in Pilot) */}
-            <div className="flex items-start gap-3 p-2.5 rounded-lg border border-gray-200 bg-gray-100/70 text-gray-400 text-xs cursor-not-allowed">
-              <Lock size={15} className="mt-0.5 text-gray-400 flex-shrink-0" />
+            {/* Tier 3: Broader Autonomy */}
+            <div className="flex items-start gap-2.5 p-2.5 rounded-xl opacity-60 text-gray-400 cursor-not-allowed">
+              <Lock size={14} className="mt-0.5 text-gray-400 flex-shrink-0" />
               <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-gray-500">Broader Autonomy</span>
-                  <span className="text-[10px] px-1.5 py-0.2 bg-gray-200 text-gray-600 rounded font-medium">Locked in Pilot</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-gray-500">Broader Autonomy</span>
+                  <span className="text-[9px] px-1.5 py-0.2 bg-gray-100 text-gray-500 rounded font-semibold uppercase">Locked in Pilot</span>
                 </div>
-                <div className="text-[11px] text-gray-400 mt-0.5">
-                  Unrestricted catalog purchasing without human-in-the-loop. Gated behind verification driving test.
-                </div>
+                <p className="text-[11px] text-gray-400 m-0 mt-0.5 leading-snug">
+                  Unrestricted catalog purchasing without human-in-the-loop.
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 2. Spending Limit & Order Cap */}
+        {/* 2. Spending Authority */}
         <div>
-          <h3 className="text-xs uppercase font-bold tracking-wider text-gray-500 mb-2">Spending Authority</h3>
-          
+          <span className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-2">
+            Spending Limit
+          </span>
+
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-xs font-semibold text-gray-700">Order Spending Limit</span>
-                <span className="text-[10px] text-red-600 font-bold">Hard cap</span>
-              </div>
-              <div className="relative">
-                <span className="absolute left-3 top-2 text-gray-400 font-bold">₹</span>
+            <div className="bg-gray-50/80 p-3 rounded-xl">
+              <div className="text-[11px] font-medium text-gray-500 mb-1">Max Order Spend</div>
+              <div className="relative flex items-center">
+                <span className="text-sm font-bold text-gray-400 mr-1">₹</span>
                 <input 
                   type="number" 
-                  className="input-field pl-7 py-1.5 font-bold text-gray-900 text-sm" 
+                  className="w-full bg-white border border-gray-200 rounded-lg px-2 py-1 text-sm font-bold text-gray-900 focus:outline-none focus:border-primary" 
                   value={mandate.budget}
                   onChange={(e) => triggerSaveNotification({ budget: Math.max(0, Number(e.target.value)) })}
                   disabled={!mandate.permissionValid}
@@ -162,20 +167,17 @@ export default function TrustControlCenter() {
               </div>
             </div>
 
-            <div>
-              <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-xs font-semibold text-gray-700">Order Frequency</span>
-                <span className="text-[10px] text-gray-400">Quota</span>
-              </div>
+            <div className="bg-gray-50/80 p-3 rounded-xl">
+              <div className="text-[11px] font-medium text-gray-500 mb-1">Order Frequency Cap</div>
               <div className="flex items-center gap-2">
                 <input 
                   type="number" 
-                  className="input-field py-1.5 text-center font-bold text-sm" 
+                  className="w-16 bg-white border border-gray-200 rounded-lg px-2 py-1 text-sm font-bold text-gray-900 text-center focus:outline-none focus:border-primary" 
                   value={mandate.orderAllowance}
                   onChange={(e) => triggerSaveNotification({ orderAllowance: Number(e.target.value) })}
                   disabled={!mandate.permissionValid}
                 />
-                <span className="text-[11px] text-gray-500 whitespace-nowrap">
+                <span className="text-[11px] text-gray-400">
                   ({mandate.ordersUsed} used)
                 </span>
               </div>
@@ -186,42 +188,42 @@ export default function TrustControlCenter() {
         {/* 3. Approved Staples */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-xs uppercase font-bold tracking-wider text-gray-500 m-0">Approved Staples</h3>
-            <span className="text-[10px] text-gray-400">Pre-cleared for autonomous reorder</span>
-          </div>
-
-          <div className="flex flex-wrap gap-1.5 p-2.5 rounded-lg border border-gray-200 bg-gray-50/50 min-h-[50px] items-center">
-            {(mandate.approvedStaples || []).map(staple => (
-              <span key={staple} className="inline-flex items-center gap-1 text-xs bg-white border border-gray-300 text-gray-800 px-2 py-1 rounded-full shadow-2xs font-medium">
-                <span>🥛</span> {staple}
-                <button 
-                  className="text-gray-400 hover:text-red-600 ml-0.5" 
-                  onClick={() => handleRemoveStaple(staple)}
-                  title="Remove from approved staples"
-                  disabled={!mandate.permissionValid}
-                >
-                  <X size={12} />
-                </button>
-              </span>
-            ))}
-            
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+              Approved Staples
+            </span>
             <button 
-              className="inline-flex items-center gap-1 text-xs text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 px-2 py-1 rounded-full font-semibold transition-colors"
+              className="text-[11px] text-primary font-bold hover:underline flex items-center gap-1"
               onClick={() => setShowAddStaple(!showAddStaple)}
               disabled={!mandate.permissionValid}
             >
-              <Plus size={12} /> Add Staple
+              <Plus size={11} /> Add Staple
             </button>
           </div>
 
+          <div className="flex flex-wrap gap-1.5 p-2 bg-gray-50/60 rounded-xl">
+            {(mandate.approvedStaples || []).map(staple => (
+              <span key={staple} className="inline-flex items-center gap-1.5 text-xs bg-white text-gray-800 px-2.5 py-1 rounded-full shadow-2xs font-medium border border-gray-100">
+                <span>🥛</span> {staple}
+                <button 
+                  className="text-gray-300 hover:text-red-500 transition-colors" 
+                  onClick={() => handleRemoveStaple(staple)}
+                  title="Remove staple"
+                  disabled={!mandate.permissionValid}
+                >
+                  <X size={11} />
+                </button>
+              </span>
+            ))}
+          </div>
+
           {showAddStaple && (
-            <div className="mt-2 p-2.5 bg-white border border-primary/30 rounded-lg shadow-sm">
-              <div className="text-[11px] font-medium text-gray-600 mb-1.5">Quick Suggestions:</div>
+            <div className="mt-2 p-3 bg-white border border-gray-200 rounded-xl shadow-sm animate-fade-in">
+              <div className="text-[11px] text-gray-500 font-medium mb-1.5">Suggestions:</div>
               <div className="flex flex-wrap gap-1 mb-2">
-                {availableStapleSuggestions.filter(s => !(mandate.approvedStaples || []).includes(s)).slice(0, 4).map(s => (
+                {availableStapleSuggestions.filter(s => !(mandate.approvedStaples || []).includes(s)).slice(0, 3).map(s => (
                   <button 
                     key={s} 
-                    className="text-[10px] bg-gray-100 hover:bg-green-50 hover:text-green-800 border border-gray-200 px-2 py-0.5 rounded transition-colors"
+                    className="text-[10px] bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-0.5 rounded transition-colors"
                     onClick={() => handleAddStaple(s)}
                   >
                     + {s}
@@ -247,94 +249,110 @@ export default function TrustControlCenter() {
 
         {/* 4. Substitution Policies */}
         <div>
-           <div className="flex justify-between items-center mb-2">
-              <h3 className="text-xs uppercase font-bold tracking-wider text-gray-500 m-0">Allowed Substitutions</h3>
-              <label className="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  className="accent-primary"
-                  checked={mandate.substitutionsAllowed}
-                  onChange={(e) => triggerSaveNotification({ substitutionsAllowed: e.target.checked })}
-                  disabled={!mandate.permissionValid}
-                />
-                Auto-Substitutions
-              </label>
-           </div>
-           
-           <div className={`flex flex-col gap-2.5 p-3 rounded-lg border ${mandate.substitutionsAllowed ? 'bg-white border-gray-200 shadow-2xs' : 'bg-gray-50 border-gray-100 opacity-60'}`}>
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-medium text-gray-700">Max Absolute Increase (₹)</span>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+              Substitution Bounds
+            </span>
+            <label className="flex items-center gap-1.5 text-xs font-semibold cursor-pointer">
+              <input 
+                type="checkbox" 
+                className="accent-primary"
+                checked={mandate.substitutionsAllowed}
+                onChange={(e) => triggerSaveNotification({ substitutionsAllowed: e.target.checked })}
+                disabled={!mandate.permissionValid}
+              />
+              <span>Enabled</span>
+            </label>
+          </div>
+
+          <div className={`p-3 rounded-xl transition-all ${
+            mandate.substitutionsAllowed ? 'bg-gray-50/80 space-y-2' : 'bg-gray-50/40 opacity-50 space-y-2'
+          }`}>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-600 font-medium">Max Absolute Increase</span>
+              <div className="flex items-center gap-1 font-mono font-bold">
+                <span>₹</span>
                 <input 
                   type="number" 
                   step="5"
-                  className="input-field w-20 py-1 text-center text-xs font-semibold" 
+                  className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-right text-xs" 
                   value={mandate.maxAbsolutePriceIncrease}
                   onChange={(e) => triggerSaveNotification({ maxAbsolutePriceIncrease: Number(e.target.value) })}
                   disabled={!mandate.substitutionsAllowed || !mandate.permissionValid}
                 />
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-medium text-gray-700">Max Percentage Increase (%)</span>
+            </div>
+
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-gray-600 font-medium">Max Percentage Increase</span>
+              <div className="flex items-center gap-1 font-mono font-bold">
                 <input 
                   type="number" 
-                  className="input-field w-20 py-1 text-center text-xs font-semibold" 
+                  className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-right text-xs" 
                   value={mandate.maxPercentagePriceIncrease}
                   onChange={(e) => triggerSaveNotification({ maxPercentagePriceIncrease: Number(e.target.value) })}
                   disabled={!mandate.substitutionsAllowed || !mandate.permissionValid}
                 />
+                <span>%</span>
               </div>
-              
-              <hr className="border-gray-100 my-0.5" />
-              
-              <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
+            </div>
+
+            <div className="pt-2 border-t border-gray-200/60 space-y-1.5 text-[11px]">
+              <label className="flex items-center gap-2 cursor-pointer text-gray-700">
                 <input 
                   type="checkbox" 
                   checked={mandate.requireSamePackageSize}
                   onChange={(e) => triggerSaveNotification({ requireSamePackageSize: e.target.checked })}
                   disabled={!mandate.substitutionsAllowed || !mandate.permissionValid}
                 />
-                Require explicit unit equivalence (e.g. 1L matches 1L)
+                <span>Require identical unit semantics (1L matches 1L)</span>
               </label>
-              <label className="flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer">
+              <label className="flex items-center gap-2 cursor-pointer text-gray-700">
                 <input 
                   type="checkbox" 
                   checked={mandate.requireCategoryEquivalence}
                   onChange={(e) => triggerSaveNotification({ requireCategoryEquivalence: e.target.checked })}
                   disabled={!mandate.substitutionsAllowed || !mandate.permissionValid}
                 />
-                Require same product category (Bakery for Bakery)
+                <span>Strict category match (Bakery for Bakery)</span>
               </label>
-           </div>
+            </div>
+          </div>
         </div>
 
-        {/* 5. Dietary Restrictions (Hard Constraints) */}
+        {/* 5. Dietary Hard Constraints */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-xs uppercase font-bold tracking-wider text-gray-500 m-0">Dietary Restrictions</h3>
-            <span className="text-[10px] text-red-600 bg-red-50 px-1.5 py-0.5 rounded border border-red-100 font-bold">
-              Hard constraint (never overridden)
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+              Dietary Restrictions
+            </span>
+            <span className="text-[10px] text-red-700 font-bold bg-red-50 px-2 py-0.5 rounded-full">
+              Hard Prohibitions
             </span>
           </div>
+
           <div className="flex flex-wrap gap-1.5">
             {['Tree-Nut', 'Peanut', 'Gluten', 'Palm Oil', 'Dairy', 'Meat'].map(diet => {
               const isSelected = mandate.dietaryRestrictions.includes(diet);
               return (
-                <label key={diet} className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full border cursor-pointer transition-all ${isSelected ? 'bg-red-50 border-red-300 text-red-900 font-bold shadow-2xs' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
-                  <input 
-                    type="checkbox" 
-                    className="hidden"
-                    checked={isSelected}
-                    onChange={(e) => {
-                      const diets = e.target.checked 
-                        ? [...mandate.dietaryRestrictions, diet]
-                        : mandate.dietaryRestrictions.filter(d => d !== diet);
-                      triggerSaveNotification({ dietaryRestrictions: diets });
-                    }}
-                    disabled={!mandate.permissionValid}
-                  />
-                  <span>{isSelected ? '🚫' : '○'}</span>
-                  No {diet}
-                </label>
+                <button
+                  key={diet}
+                  type="button"
+                  className={`text-xs px-2.5 py-1 rounded-full font-medium transition-all ${
+                    isSelected 
+                      ? 'bg-red-50 text-red-900 border border-red-200 font-bold shadow-2xs' 
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                  onClick={() => {
+                    const diets = isSelected
+                      ? mandate.dietaryRestrictions.filter(d => d !== diet)
+                      : [...mandate.dietaryRestrictions, diet];
+                    triggerSaveNotification({ dietaryRestrictions: diets });
+                  }}
+                  disabled={!mandate.permissionValid}
+                >
+                  {isSelected ? `🚫 No ${diet}` : `+ ${diet}`}
+                </button>
               );
             })}
           </div>
@@ -342,12 +360,18 @@ export default function TrustControlCenter() {
 
         {/* 6. Doubt Resolution Channel */}
         <div>
-          <h3 className="text-xs uppercase font-bold tracking-wider text-gray-500 mb-1.5">Doubt Resolution Channel</h3>
-          <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
+          <span className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-2">
+            Doubt Resolution Channel
+          </span>
+          <div className="flex bg-gray-100 p-1 rounded-xl">
             {(['whatsapp', 'in-app', 'auto-reject'] as const).map(channel => (
               <button 
                 key={channel}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${mandate.doubtResolutionChannel === channel ? 'bg-white shadow-sm text-primary font-bold' : 'text-gray-500 hover:text-gray-800'}`}
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                  mandate.doubtResolutionChannel === channel 
+                    ? 'bg-white shadow-xs text-primary font-bold' 
+                    : 'text-gray-500 hover:text-gray-800'
+                }`}
                 onClick={() => triggerSaveNotification({ doubtResolutionChannel: channel })}
                 disabled={!mandate.permissionValid}
               >
@@ -359,47 +383,46 @@ export default function TrustControlCenter() {
 
       </div>
 
-      {/* Feature 6: Pause, Revoke & Permission Controls */}
-      <div className="mt-6 pt-4 border-t border-gray-200 flex flex-col gap-2.5">
-        
-        {/* Standby / Pause Status Banner */}
+      {/* Feature 6: Permission & Standby Controls */}
+      <div className="pt-4 mt-4 border-t border-gray-100 space-y-2">
         {mandate.isPaused && (
-          <div className="bg-amber-50 border border-amber-200 text-amber-900 text-xs p-2.5 rounded-lg flex items-center gap-2">
-            <AlertTriangle size={16} className="text-amber-600 flex-shrink-0" />
-            <div>
-              <span className="font-bold">Agent Paused:</span> Autonomous execution is on hold. Resuming will restore mandate actions.
-            </div>
+          <div className="bg-amber-50 text-amber-900 text-xs p-2 rounded-lg flex items-center gap-1.5 font-medium">
+            <AlertTriangle size={14} className="text-amber-600 flex-shrink-0" />
+            <span>Agent Paused. Actions are temporarily on hold.</span>
           </div>
         )}
 
-        {/* Revoked Status Banner */}
         {!mandate.permissionValid && (
-          <div className="bg-red-50 border border-red-200 text-red-900 text-xs p-2.5 rounded-lg flex items-center gap-2">
-            <PowerOff size={16} className="text-red-600 flex-shrink-0" />
-            <div>
-              <span className="font-bold">Authority Revoked:</span> Kill-switch engaged. All actions immediately blocked (STOP).
-            </div>
+          <div className="bg-red-50 text-red-900 text-xs p-2 rounded-lg flex items-center gap-1.5 font-medium">
+            <PowerOff size={14} className="text-red-600 flex-shrink-0" />
+            <span>Authority Revoked. All actions blocked (STOP).</span>
           </div>
         )}
 
-        <div className="flex items-center justify-between gap-2">
-          {/* Pause Button */}
+        <div className="flex gap-2">
           <button
-            className={`btn text-xs flex-1 py-2 font-semibold flex items-center justify-center gap-1.5 ${mandate.isPaused ? 'bg-amber-600 text-white hover:bg-amber-700' : 'bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300'}`}
+            className={`btn text-xs flex-1 py-2 font-semibold flex items-center justify-center gap-1.5 rounded-xl ${
+              mandate.isPaused 
+                ? 'bg-amber-600 text-white hover:bg-amber-700' 
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+            }`}
             onClick={() => triggerSaveNotification({ isPaused: !mandate.isPaused })}
             disabled={!mandate.permissionValid}
           >
-            {mandate.isPaused ? <PlayCircle size={15} /> : <PauseCircle size={15} />}
-            {mandate.isPaused ? 'Resume Agent' : 'Pause Agent'}
+            {mandate.isPaused ? <PlayCircle size={14} /> : <PauseCircle size={14} />}
+            <span>{mandate.isPaused ? 'Resume Agent' : 'Pause Agent'}</span>
           </button>
 
-          {/* Hard Revoke Button */}
           <button 
-            className={`btn text-xs flex-1 py-2 font-semibold flex items-center justify-center gap-1.5 ${mandate.permissionValid ? 'btn-outline text-red-700 bg-red-50/50 border-red-300 hover:bg-red-100' : 'btn-primary bg-green-700 hover:bg-green-800 text-white'}`}
+            className={`btn text-xs flex-1 py-2 font-semibold flex items-center justify-center gap-1.5 rounded-xl ${
+              mandate.permissionValid 
+                ? 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200' 
+                : 'bg-green-700 text-white hover:bg-green-800'
+            }`}
             onClick={() => triggerSaveNotification({ permissionValid: !mandate.permissionValid })}
           >
-            {mandate.permissionValid ? <PowerOff size={15} /> : <ShieldCheck size={15} />}
-            {mandate.permissionValid ? 'Revoke Authority' : 'Restore Authority'}
+            {mandate.permissionValid ? <PowerOff size={14} /> : <ShieldCheck size={14} />}
+            <span>{mandate.permissionValid ? 'Revoke Authority' : 'Restore Authority'}</span>
           </button>
         </div>
       </div>
