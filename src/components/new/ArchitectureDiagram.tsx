@@ -1,325 +1,489 @@
-import { useState } from 'react';
-import { ArrowRight, ArrowDown, ArrowUp, Activity, ShieldCheck, HelpCircle, AlertOctagon, Layers } from 'lucide-react';
-
-type FlowMode = 'all' | 'act' | 'ask' | 'stop';
-
 export default function ArchitectureDiagram() {
-  const [activeFlow, setActiveFlow] = useState<FlowMode>('all');
-
-  const isStepHighlighted = (step: string) => {
-    if (activeFlow === 'all') return true;
-    if (activeFlow === 'act') return ['agent', 'gateway', 'intent', 'authority', 'execution', 'evidence'].includes(step);
-    if (activeFlow === 'ask') return ['agent', 'gateway', 'intent', 'user_confirms', 'pref_store', 'authority'].includes(step);
-    if (activeFlow === 'stop') return ['agent', 'gateway', 'intent', 'authority', 'execution', 'stop_halt'].includes(step);
-    return true;
-  };
-
   return (
-    <div className="bg-[#FAF8F5] rounded-3xl p-6 sm:p-8 lg:p-10 border border-[#E8E2D9] shadow-sm mb-14 text-gray-900 font-sans">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 pb-6 mb-8 border-b border-[#E8E2D9]">
-        <div>
-          <div className="text-[11px] font-bold text-[#C2410C] uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-            <Layers size={13} />
-            <span>System Architecture</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#143D30] tracking-tight m-0">
-            How an agent request becomes a safe order
-          </h2>
-          <div className="text-[11px] font-semibold text-[#9A3412] uppercase tracking-wider mt-2">
-            Proposed Design · No Existing Instacart Systems or Endpoints are Assumed
-          </div>
-        </div>
-
-        {/* Interactive Mode Filter */}
-        <div className="flex flex-wrap items-center gap-1.5 bg-white p-1 rounded-xl border border-gray-200 shadow-2xs self-start lg:self-auto">
-          <button
-            onClick={() => setActiveFlow('all')}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-              activeFlow === 'all' ? 'bg-[#143D30] text-white shadow-xs' : 'text-gray-600 hover:text-gray-900'
-            }`}
+    <div className="w-full max-w-6xl mx-auto my-8 bg-[#FAF7F2] rounded-2xl border border-[#E8E2D9] shadow-sm overflow-hidden p-3 sm:p-6 lg:p-8">
+      <svg
+        viewBox="0 0 1160 620"
+        className="w-full h-auto block select-none"
+        style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}
+      >
+        <defs>
+          {/* Arrowhead marker - dark grey */}
+          <marker
+            id="arrow-grey"
+            viewBox="0 0 10 10"
+            refX="6"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
           >
-            Full Architecture
-          </button>
-          <button
-            onClick={() => setActiveFlow('act')}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1 ${
-              activeFlow === 'act' ? 'bg-green-700 text-white shadow-xs' : 'text-green-800 hover:bg-green-50'
-            }`}
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2B3630" />
+          </marker>
+
+          {/* Arrowhead marker - red/terracotta for ASK and STOP */}
+          <marker
+            id="arrow-red"
+            viewBox="0 0 10 10"
+            refX="6"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
           >
-            <ShieldCheck size={12} />
-            <span>ACT Path</span>
-          </button>
-          <button
-            onClick={() => setActiveFlow('ask')}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1 ${
-              activeFlow === 'ask' ? 'bg-amber-600 text-white shadow-xs' : 'text-amber-800 hover:bg-amber-50'
-            }`}
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#A8382A" />
+          </marker>
+
+          {/* Arrowhead marker - dark green for updated request */}
+          <marker
+            id="arrow-green"
+            viewBox="0 0 10 10"
+            refX="6"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
           >
-            <HelpCircle size={12} />
-            <span>ASK Loop</span>
-          </button>
-          <button
-            onClick={() => setActiveFlow('stop')}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1 ${
-              activeFlow === 'stop' ? 'bg-red-700 text-white shadow-xs' : 'text-red-800 hover:bg-red-50'
-            }`}
-          >
-            <AlertOctagon size={12} />
-            <span>STOP Halt</span>
-          </button>
-        </div>
-      </div>
+            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#1C4233" />
+          </marker>
+        </defs>
 
-      {/* Main Diagram Area */}
-      <div className="space-y-6 overflow-x-auto pb-2 custom-scrollbar">
-        
-        {/* ROW 1: 6-Step Main Execution Pipeline */}
-        <div className="min-w-[900px]">
-          <div className="grid grid-cols-6 gap-3 items-stretch relative">
-            
-            {/* Step 1: AGENT */}
-            <div className={`transition-all duration-300 rounded-xl p-4 flex flex-col justify-between border ${
-              isStepHighlighted('agent') 
-                ? 'bg-white border-gray-300 shadow-xs' 
-                : 'bg-white/40 border-gray-200/50 opacity-40'
-            }`}>
-              <div>
-                <div className="text-[10px] font-bold text-[#C2410C] uppercase tracking-wider mb-1.5">1 · Agent</div>
-                <div className="font-bold text-gray-900 text-sm leading-snug">User's external AI agent</div>
-              </div>
-              <div className="text-[11px] text-gray-500 mt-3 pt-2 border-t border-gray-100">
-                Sends a structured request
-              </div>
-            </div>
+        {/* ===================== HEADER ===================== */}
+        <text
+          x="50"
+          y="42"
+          fontSize="11"
+          fontWeight="700"
+          fill="#A8382A"
+          letterSpacing="0.14em"
+        >
+          SYSTEM ARCHITECTURE
+        </text>
 
-            {/* Step 2: GATEWAY */}
-            <div className={`transition-all duration-300 rounded-xl p-4 flex flex-col justify-between border relative ${
-              isStepHighlighted('gateway') 
-                ? 'bg-white border-gray-300 shadow-xs' 
-                : 'bg-white/40 border-gray-200/50 opacity-40'
-            }`}>
-              {/* Left Connector Arrow */}
-              <div className="absolute -left-2.5 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none">
-                <ArrowRight size={14} className="stroke-[2.5]" />
-              </div>
-              <div>
-                <div className="text-[10px] font-bold text-[#C2410C] uppercase tracking-wider mb-1.5">2 · Gateway</div>
-                <div className="font-bold text-gray-900 text-sm leading-snug">API / MCP gateway</div>
-              </div>
-              <div className="text-[11px] text-gray-500 mt-3 pt-2 border-t border-gray-100">
-                Access, permissions, format
-              </div>
-            </div>
+        <text
+          x="50"
+          y="82"
+          fontSize="33"
+          fontWeight="700"
+          fill="#1C4233"
+          style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+        >
+          How an agent request becomes a safe order
+        </text>
 
-            {/* Step 3: INTENT */}
-            <div className={`transition-all duration-300 rounded-xl p-4 flex flex-col justify-between border relative ${
-              isStepHighlighted('intent') 
-                ? 'bg-[#EAF3EE] border-[#B2D8C7] shadow-xs' 
-                : 'bg-green-50/20 border-green-200/40 opacity-40'
-            }`}>
-              {/* Left Connector Arrow */}
-              <div className="absolute -left-2.5 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none">
-                <ArrowRight size={14} className="stroke-[2.5]" />
-              </div>
-              <div>
-                <div className="text-[10px] font-bold text-[#C2410C] uppercase tracking-wider mb-1.5">3 · Intent</div>
-                <div className="font-bold text-gray-900 text-sm leading-snug">Intent and quantity validator</div>
-              </div>
-              <div className="text-[11px] text-gray-600 mt-3 pt-2 border-t border-green-200/60">
-                Variants, units, pack sizes
-              </div>
-            </div>
+        <text
+          x="50"
+          y="112"
+          fontSize="10.5"
+          fontWeight="700"
+          fill="#A8382A"
+          letterSpacing="0.08em"
+        >
+          PROPOSED DESIGN · NO EXISTING INSTACART SYSTEMS OR ENDPOINTS ARE ASSUMED
+        </text>
 
-            {/* Step 4: AUTHORITY */}
-            <div className={`transition-all duration-300 rounded-xl p-4 flex flex-col justify-between border relative ${
-              isStepHighlighted('authority') 
-                ? 'bg-[#EAF3EE] border-[#B2D8C7] shadow-xs' 
-                : 'bg-green-50/20 border-green-200/40 opacity-40'
-            }`}>
-              {/* Left Connector Arrow */}
-              <div className="absolute -left-2.5 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none">
-                <ArrowRight size={14} className="stroke-[2.5]" />
-              </div>
-              <div>
-                <div className="text-[10px] font-bold text-[#C2410C] uppercase tracking-wider mb-1.5">4 · Authority</div>
-                <div className="font-bold text-gray-900 text-sm leading-snug">Preference and policy</div>
-              </div>
-              <div className="text-[11px] text-gray-600 mt-3 pt-2 border-t border-green-200/60">
-                Limits, rules, hard constraints
-              </div>
-            </div>
+        {/* ===================== ROW 1: 6 PIPELINE BOXES ===================== */}
 
-            {/* Step 5: EXECUTION */}
-            <div className={`transition-all duration-300 rounded-xl p-4 flex flex-col justify-between border relative ${
-              isStepHighlighted('execution') 
-                ? 'bg-white border-gray-300 shadow-xs' 
-                : 'bg-white/40 border-gray-200/50 opacity-40'
-            }`}>
-              {/* Left Connector Arrow */}
-              <div className="absolute -left-2.5 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none">
-                <ArrowRight size={14} className="stroke-[2.5]" />
-              </div>
-              <div>
-                <div className="text-[10px] font-bold text-[#C2410C] uppercase tracking-wider mb-1.5">5 · Execution</div>
-                <div className="font-bold text-gray-900 text-sm leading-snug">Catalog and execution</div>
-              </div>
-              <div className="text-[11px] text-gray-500 mt-3 pt-2 border-t border-gray-100">
-                Availability, price, order
-              </div>
-            </div>
+        {/* Box 1: 1 · AGENT */}
+        <g id="box-1">
+          <rect
+            x="50"
+            y="145"
+            width="154"
+            height="112"
+            fill="#FFFFFF"
+            stroke="#DCD7CE"
+            strokeWidth="1.2"
+          />
+          <text x="64" y="166" fontSize="10" fontWeight="700" fill="#A8382A" letterSpacing="0.04em">
+            1 · AGENT
+          </text>
+          <text x="64" y="186" fontSize="12.5" fontWeight="700" fill="#1C4233">
+            User's external AI
+          </text>
+          <text x="64" y="202" fontSize="12.5" fontWeight="700" fill="#1C4233">
+            agent
+          </text>
+          <text x="64" y="235" fontSize="10.5" fill="#4B5563">
+            Sends a structured
+          </text>
+          <text x="64" y="248" fontSize="10.5" fill="#4B5563">
+            request
+          </text>
+        </g>
 
-            {/* Step 6: EVIDENCE */}
-            <div className={`transition-all duration-300 rounded-xl p-4 flex flex-col justify-between border relative ${
-              isStepHighlighted('evidence') 
-                ? 'bg-white border-gray-300 shadow-xs' 
-                : 'bg-white/40 border-gray-200/50 opacity-40'
-            }`}>
-              {/* Left Connector Arrow */}
-              <div className="absolute -left-2.5 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none">
-                <ArrowRight size={14} className="stroke-[2.5]" />
-              </div>
-              <div>
-                <div className="text-[10px] font-bold text-[#C2410C] uppercase tracking-wider mb-1.5">6 · Evidence</div>
-                <div className="font-bold text-gray-900 text-sm leading-snug">Receipt and audit log</div>
-              </div>
-              <div className="text-[11px] text-gray-500 mt-3 pt-2 border-t border-gray-100">
-                Asked, happened, why, recovery
-              </div>
-            </div>
+        {/* Arrow 1 -> 2 */}
+        <line
+          x1="204"
+          y1="201"
+          x2="228"
+          y2="201"
+          stroke="#2B3630"
+          strokeWidth="1.4"
+          markerEnd="url(#arrow-grey)"
+        />
 
-          </div>
+        {/* Box 2: 2 · GATEWAY */}
+        <g id="box-2">
+          <rect
+            x="230"
+            y="145"
+            width="154"
+            height="112"
+            fill="#FFFFFF"
+            stroke="#DCD7CE"
+            strokeWidth="1.2"
+          />
+          <text x="244" y="166" fontSize="10" fontWeight="700" fill="#A8382A" letterSpacing="0.04em">
+            2 · GATEWAY
+          </text>
+          <text x="244" y="186" fontSize="12.5" fontWeight="700" fill="#1C4233">
+            API / MCP gateway
+          </text>
+          <text x="244" y="235" fontSize="10.5" fill="#4B5563">
+            Access, permissions,
+          </text>
+          <text x="244" y="248" fontSize="10.5" fill="#4B5563">
+            format
+          </text>
+        </g>
 
-          {/* Connectors Between Row 1 and Row 2 */}
-          <div className="grid grid-cols-6 gap-3 my-2 text-center">
-            <div className="col-span-2 relative flex items-center justify-end pr-8">
-              {/* Updated request loop line returning to Step 1 */}
-              <div className={`text-[10px] font-bold text-[#143D30] flex items-center gap-1 transition-opacity ${
-                activeFlow === 'ask' || activeFlow === 'all' ? 'opacity-100' : 'opacity-20'
-              }`}>
-                <ArrowUp size={13} className="text-[#143D30]" />
-                <span>updated request</span>
-              </div>
-            </div>
+        {/* Arrow 2 -> 3 */}
+        <line
+          x1="384"
+          y1="201"
+          x2="408"
+          y2="201"
+          stroke="#2B3630"
+          strokeWidth="1.4"
+          markerEnd="url(#arrow-grey)"
+        />
 
-            {/* ASK Branch under Step 3 */}
-            <div className="flex justify-center items-center">
-              <div className={`flex flex-col items-center transition-opacity ${
-                activeFlow === 'ask' || activeFlow === 'all' ? 'opacity-100' : 'opacity-20'
-              }`}>
-                <span className="text-[10px] font-black text-[#C2410C] uppercase tracking-wider mb-0.5">ASK</span>
-                <ArrowDown size={15} className="text-[#C2410C] stroke-[2.5]" />
-              </div>
-            </div>
+        {/* Box 3: 3 · INTENT (Sage Green) */}
+        <g id="box-3">
+          <rect
+            x="410"
+            y="145"
+            width="154"
+            height="112"
+            fill="#DFEAE2"
+            stroke="#BDD4C5"
+            strokeWidth="1.2"
+          />
+          <text x="424" y="166" fontSize="10" fontWeight="700" fill="#A8382A" letterSpacing="0.04em">
+            3 · INTENT
+          </text>
+          <text x="424" y="186" fontSize="12.5" fontWeight="700" fill="#1C4233">
+            Intent and
+          </text>
+          <text x="424" y="202" fontSize="12.5" fontWeight="700" fill="#1C4233">
+            quantity validator
+          </text>
+          <text x="424" y="235" fontSize="10.5" fill="#3A4D43">
+            Variants, units, pack
+          </text>
+          <text x="424" y="248" fontSize="10.5" fill="#3A4D43">
+            sizes
+          </text>
+        </g>
 
-            {/* Reads Branch under Step 4 */}
-            <div className="flex justify-center items-center">
-              <div className={`flex flex-col items-center transition-opacity ${
-                activeFlow === 'ask' || activeFlow === 'all' ? 'opacity-100' : 'opacity-20'
-              }`}>
-                <ArrowUp size={15} className="text-green-700 stroke-[2.5]" />
-                <span className="text-[10px] font-bold text-green-800 mt-0.5">reads</span>
-              </div>
-            </div>
+        {/* Arrow 3 -> 4 */}
+        <line
+          x1="564"
+          y1="201"
+          x2="588"
+          y2="201"
+          stroke="#2B3630"
+          strokeWidth="1.4"
+          markerEnd="url(#arrow-grey)"
+        />
 
-            {/* STOP Branch under Step 5 */}
-            <div className="flex justify-center items-center col-span-2 justify-start pl-12">
-              <div className={`flex flex-col items-center transition-opacity ${
-                activeFlow === 'stop' || activeFlow === 'all' ? 'opacity-100' : 'opacity-20'
-              }`}>
-                <span className="text-[10px] font-black text-red-600 uppercase tracking-wider mb-0.5">STOP</span>
-                <ArrowDown size={15} className="text-red-600 stroke-[2.5]" />
-              </div>
-            </div>
-          </div>
+        {/* Box 4: 4 · AUTHORITY (Sage Green) */}
+        <g id="box-4">
+          <rect
+            x="590"
+            y="145"
+            width="154"
+            height="112"
+            fill="#DFEAE2"
+            stroke="#BDD4C5"
+            strokeWidth="1.2"
+          />
+          <text x="604" y="166" fontSize="10" fontWeight="700" fill="#A8382A" letterSpacing="0.04em">
+            4 · AUTHORITY
+          </text>
+          <text x="604" y="186" fontSize="12.5" fontWeight="700" fill="#1C4233">
+            Preference and
+          </text>
+          <text x="604" y="202" fontSize="12.5" fontWeight="700" fill="#1C4233">
+            policy
+          </text>
+          <text x="604" y="235" fontSize="10.5" fill="#3A4D43">
+            Limits, rules, hard
+          </text>
+          <text x="604" y="248" fontSize="10.5" fill="#3A4D43">
+            constraints
+          </text>
+        </g>
 
-          {/* ROW 2: Feedback & Safety Branching */}
-          <div className="grid grid-cols-12 gap-3 items-stretch">
-            
-            {/* Blank Spacer under Steps 1 & 2 */}
-            <div className="col-span-2"></div>
+        {/* Arrow 4 -> 5 */}
+        <line
+          x1="744"
+          y1="201"
+          x2="768"
+          y2="201"
+          stroke="#2B3630"
+          strokeWidth="1.4"
+          markerEnd="url(#arrow-grey)"
+        />
 
-            {/* User Confirms (Spans under Step 3 and into Step 2) */}
-            <div className={`col-span-3 transition-all duration-300 rounded-xl p-4 flex flex-col justify-between border-2 ${
-              isStepHighlighted('user_confirms') 
-                ? 'bg-white border-[#143D30] shadow-sm' 
-                : 'bg-white/40 border-gray-200/50 opacity-40'
-            }`}>
-              <div>
-                <div className="font-black text-gray-900 text-sm">User confirms</div>
-                <div className="text-[11px] text-gray-500 mt-1">Proposed: WhatsApp or in-app</div>
-              </div>
-              <div className="text-[10px] font-bold text-primary flex items-center gap-1 mt-2">
-                <span>Resolves doubt</span>
-              </div>
-            </div>
+        {/* Box 5: 5 · EXECUTION */}
+        <g id="box-5">
+          <rect
+            x="770"
+            y="145"
+            width="154"
+            height="112"
+            fill="#FFFFFF"
+            stroke="#DCD7CE"
+            strokeWidth="1.2"
+          />
+          <text x="784" y="166" fontSize="10" fontWeight="700" fill="#A8382A" letterSpacing="0.04em">
+            5 · EXECUTION
+          </text>
+          <text x="784" y="186" fontSize="12.5" fontWeight="700" fill="#1C4233">
+            Catalog and
+          </text>
+          <text x="784" y="202" fontSize="12.5" fontWeight="700" fill="#1C4233">
+            execution
+          </text>
+          <text x="784" y="235" fontSize="10.5" fill="#4B5563">
+            Availability, price,
+          </text>
+          <text x="784" y="248" fontSize="10.5" fill="#4B5563">
+            order
+          </text>
+        </g>
 
-            {/* Save arrow connector */}
-            <div className="col-span-1 flex items-center justify-center">
-              <div className={`flex flex-col items-center text-center transition-opacity ${
-                activeFlow === 'ask' || activeFlow === 'all' ? 'opacity-100' : 'opacity-20'
-              }`}>
-                <span className="text-[10px] font-bold text-gray-500">save</span>
-                <ArrowRight size={14} className="text-gray-400 stroke-[2.5]" />
-              </div>
-            </div>
+        {/* Arrow 5 -> 6 */}
+        <line
+          x1="924"
+          y1="201"
+          x2="948"
+          y2="201"
+          stroke="#2B3630"
+          strokeWidth="1.4"
+          markerEnd="url(#arrow-grey)"
+        />
 
-            {/* User Preference Store (Under Step 4) */}
-            <div className={`col-span-3 transition-all duration-300 rounded-xl p-4 flex flex-col justify-between border ${
-              isStepHighlighted('pref_store') 
-                ? 'bg-[#EAF3EE] border-[#B2D8C7] shadow-xs' 
-                : 'bg-green-50/20 border-green-200/40 opacity-40'
-            }`}>
-              <div>
-                <div className="font-bold text-gray-900 text-sm">User preference store</div>
-                <div className="text-[11px] text-gray-600 mt-1">Private to the user</div>
-              </div>
-              <div className="text-[10px] font-bold text-green-800 flex items-center gap-1 mt-2">
-                <span>Personal constitution</span>
-              </div>
-            </div>
+        {/* Box 6: 6 · EVIDENCE */}
+        <g id="box-6">
+          <rect
+            x="950"
+            y="145"
+            width="154"
+            height="112"
+            fill="#FFFFFF"
+            stroke="#DCD7CE"
+            strokeWidth="1.2"
+          />
+          <text x="964" y="166" fontSize="10" fontWeight="700" fill="#A8382A" letterSpacing="0.04em">
+            6 · EVIDENCE
+          </text>
+          <text x="964" y="186" fontSize="12.5" fontWeight="700" fill="#1C4233">
+            Receipt and audit
+          </text>
+          <text x="964" y="202" fontSize="12.5" fontWeight="700" fill="#1C4233">
+            log
+          </text>
+          <text x="964" y="235" fontSize="10.5" fill="#4B5563">
+            Asked, happened, why,
+          </text>
+          <text x="964" y="248" fontSize="10.5" fill="#4B5563">
+            recovery
+          </text>
+        </g>
 
-            {/* STOP Halt Box (Under Step 5) */}
-            <div className={`col-span-3 transition-all duration-300 rounded-xl p-4 flex flex-col justify-between border-2 ${
-              isStepHighlighted('stop_halt') 
-                ? 'bg-[#FDF2F2] border-[#B91C1C] shadow-sm' 
-                : 'bg-red-50/20 border-red-200/40 opacity-40'
-            }`}>
-              <div>
-                <div className="font-black text-[#B91C1C] text-sm">STOP</div>
-                <div className="text-[11px] text-red-900 mt-1 leading-snug">
-                  Hard rule broken or action cannot be verified: that action halts
-                </div>
-              </div>
-              <div className="text-[10px] font-bold text-red-700 flex items-center gap-1 mt-2">
-                <span>Non-overridable boundary</span>
-              </div>
-            </div>
+        {/* ===================== ROW 2: BRANCHING & FEEDBACK ===================== */}
 
-          </div>
+        {/* 1. Downward Arrow: Box 3 (INTENT) -> User Confirms (ASK) */}
+        <line
+          x1="450"
+          y1="257"
+          x2="450"
+          y2="307"
+          stroke="#A8382A"
+          strokeWidth="1.4"
+          markerEnd="url(#arrow-red)"
+        />
+        <text x="458" y="287" fontSize="11" fontWeight="700" fill="#A8382A">
+          ASK
+        </text>
 
-        </div>
+        {/* User confirms box (Dark Green Border) */}
+        <g id="box-user-confirms">
+          <rect
+            x="295"
+            y="310"
+            width="275"
+            height="90"
+            fill="#FFFFFF"
+            stroke="#1C4233"
+            strokeWidth="2"
+          />
+          <text x="312" y="342" fontSize="15" fontWeight="700" fill="#1C4233">
+            User confirms
+          </text>
+          <text x="312" y="370" fontSize="11.5" fill="#555555">
+            Proposed: WhatsApp or in-app
+          </text>
+        </g>
 
-        {/* Global Monitoring & Logging Bar */}
-        <div className="p-3 bg-white/80 border border-gray-200/80 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold text-gray-700 text-center shadow-2xs">
-          <Activity size={15} className="text-[#143D30] animate-pulse" />
-          <span>Logging and monitoring across every step: request ID, decision, reason</span>
-        </div>
+        {/* 2. Feedback loop: User confirms -> Box 1 (updated request) */}
+        {/* Right-angled line: starts at left edge of User Confirms, goes left, then up to bottom of Box 1 */}
+        <polyline
+          points="295,355 127,355 127,260"
+          fill="none"
+          stroke="#1C4233"
+          strokeWidth="1.4"
+          markerEnd="url(#arrow-green)"
+        />
+        <text x="135" y="310" fontSize="11" fontWeight="700" fill="#1C4233">
+          updated request
+        </text>
 
-        {/* Product Thesis Legend */}
-        <div className="pt-2 text-center text-xs sm:text-sm text-gray-600 leading-relaxed">
-          <span className="font-bold text-green-800 bg-green-50 px-2 py-0.5 rounded border border-green-200">ACT</span> when intent is clear and inside the mandate.{' '}
-          <span className="font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 ml-1">ASK</span> when the user can resolve it.{' '}
-          <span className="font-bold text-red-800 bg-red-50 px-2 py-0.5 rounded border border-red-200 ml-1">STOP</span> when a hard rule fails or the result cannot be verified.
-        </div>
+        {/* 3. Arrow: User confirms -> User preference store (save) */}
+        <line
+          x1="570"
+          y1="355"
+          x2="618"
+          y2="355"
+          stroke="#2B3630"
+          strokeWidth="1.4"
+          markerEnd="url(#arrow-grey)"
+        />
+        <text x="575" y="347" fontSize="11" fontWeight="600" fill="#2B3630">
+          save
+        </text>
 
-      </div>
+        {/* User preference store box (Sage Green) */}
+        <g id="box-pref-store">
+          <rect
+            x="620"
+            y="310"
+            width="168"
+            height="90"
+            fill="#DFEAE2"
+            stroke="#BDD4C5"
+            strokeWidth="1.2"
+          />
+          <text x="632" y="340" fontSize="13.5" fontWeight="700" fill="#1C4233">
+            User preference
+          </text>
+          <text x="632" y="356" fontSize="13.5" fontWeight="700" fill="#1C4233">
+            store
+          </text>
+          <text x="632" y="380" fontSize="11" fill="#4B5563">
+            Private to the user
+          </text>
+        </g>
 
-      {/* Footer Meta */}
-      <div className="pt-4 mt-6 border-t border-[#E8E2D9] flex justify-between items-center text-[10px] text-gray-400 font-medium">
-        <span>Instacart, Ready to Act · Agent-readiness case study</span>
-        <span className="font-mono">Reference Spec · Slide 3</span>
-      </div>
+        {/* 4. Upward Arrow: User preference store -> Box 4 (reads) */}
+        <line
+          x1="680"
+          y1="310"
+          x2="680"
+          y2="260"
+          stroke="#2B3630"
+          strokeWidth="1.4"
+          markerEnd="url(#arrow-grey)"
+        />
+        <text x="688" y="287" fontSize="11" fontWeight="600" fill="#2B3630">
+          reads
+        </text>
+
+        {/* 5. Downward Arrow: Box 5 (EXECUTION) -> STOP */}
+        <line
+          x1="855"
+          y1="257"
+          x2="855"
+          y2="307"
+          stroke="#A8382A"
+          strokeWidth="1.4"
+          markerEnd="url(#arrow-red)"
+        />
+        <text x="864" y="287" fontSize="11" fontWeight="700" fill="#A8382A">
+          STOP
+        </text>
+
+        {/* STOP box (Light Pink / Coral with dark red border) */}
+        <g id="box-stop">
+          <rect
+            x="815"
+            y="310"
+            width="250"
+            height="90"
+            fill="#F6E7E4"
+            stroke="#A8382A"
+            strokeWidth="1.5"
+          />
+          <text x="830" y="342" fontSize="15" fontWeight="700" fill="#A8382A">
+            STOP
+          </text>
+          <text x="830" y="367" fontSize="11" fill="#555555">
+            Hard rule broken or action cannot be
+          </text>
+          <text x="830" y="382" fontSize="11" fill="#555555">
+            verified: that action halts
+          </text>
+        </g>
+
+        {/* ===================== LOGGING & MONITORING BAR ===================== */}
+        <rect
+          x="50"
+          y="435"
+          width="1054"
+          height="38"
+          fill="#ECE7DE"
+        />
+        <text
+          x="577"
+          y="459"
+          fontSize="12.5"
+          fontWeight="600"
+          fill="#1C4233"
+          textAnchor="middle"
+        >
+          Logging and monitoring across every step: request ID, decision, reason
+        </text>
+
+        {/* ===================== SUMMARY STATEMENT ===================== */}
+        <text x="50" y="522" fontSize="13.5" fill="#2B3630">
+          <tspan fontWeight="700" fill="#1C4233">ACT</tspan>
+          <tspan fill="#2B3630"> when intent is clear and inside the mandate. </tspan>
+          <tspan fontWeight="700" fill="#A8382A">ASK</tspan>
+          <tspan fill="#2B3630"> when the user can resolve it. </tspan>
+          <tspan fontWeight="700" fill="#A8382A">STOP</tspan>
+          <tspan fill="#2B3630"> when a hard rule fails or the result cannot be verified.</tspan>
+        </text>
+
+        {/* ===================== FOOTER ===================== */}
+        <line
+          x1="50"
+          y1="575"
+          x2="1104"
+          y2="575"
+          stroke="#DCD7CE"
+          strokeWidth="1"
+        />
+
+        <text x="50" y="598" fontSize="10" fill="#78716C">
+          Instacart, Ready to Act · Agent-readiness case study
+        </text>
+
+        <text x="1104" y="598" fontSize="10" fill="#78716C" textAnchor="end">
+          3
+        </text>
+      </svg>
     </div>
   );
 }
