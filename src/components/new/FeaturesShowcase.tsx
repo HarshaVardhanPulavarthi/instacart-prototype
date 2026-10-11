@@ -1,20 +1,24 @@
 import { ShieldCheck, MessageCircle, BrainCircuit, Rocket, CheckCircle2, Zap, ArrowUpRight } from 'lucide-react';
+import ArchitectureDiagram from './ArchitectureDiagram';
 
 export default function FeaturesShowcase() {
   return (
     <div className="animate-fade-in max-w-6xl mx-auto pb-12">
-      <div className="text-center mb-16 relative">
+      <div className="text-center mb-12 relative">
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 to-transparent blur-3xl opacity-50 h-full"></div>
-        <div className="inline-flex items-center justify-center p-4 bg-white shadow-xl shadow-primary/10 rounded-2xl mb-6 border border-gray-100">
-          <Zap size={32} className="text-primary fill-primary/20" />
+        <div className="inline-flex items-center justify-center p-3.5 bg-white shadow-xl shadow-primary/10 rounded-2xl mb-5 border border-gray-100">
+          <Zap size={28} className="text-primary fill-primary/20" />
         </div>
-        <h2 className="text-5xl font-extrabold mb-4 tracking-tight text-gray-900">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 tracking-tight text-gray-900">
           Platform <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-green-500">Architecture</span>
         </h2>
-        <p className="text-xl text-gray-500 max-w-2xl mx-auto font-medium">
+        <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto font-medium leading-relaxed m-0">
           A technical breakdown of the trust frameworks, safety rails, and semantic engines powering the Agent-Readiness prototype.
         </p>
       </div>
+
+      {/* Slide Architecture Diagram */}
+      <ArchitectureDiagram />
 
       <div className="space-y-12">
         {/* Category 1 */}
